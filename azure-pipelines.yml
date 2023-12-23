@@ -41,7 +41,7 @@ stages:
               provider: 'azurerm'
               command: 'validate'
   - stage: tfDeploy
-    condition: succeeded(tfValidate)
+    condition: succeeded('tfValidate')
     dependsOn: tfValidate
     jobs:
       - job: apply
