@@ -2,6 +2,7 @@
 # Start with a minimal pipeline that you can customize to build and deploy your code.
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
+# Build following steps from https://www.youtube.com/watch?v=d85-KD9stqc&t=763s
 
 trigger: none
 
@@ -14,11 +15,14 @@ variables:
   terraformContainer: 'terraform-scripts'
   terraformContainerKey: 'V4c8Aez6EiYqAPqBGL6fbiY3YWZ4DwkCosi0GD0sP1fcyshhuRZ4aV6fpwdQE847iyArbmOLFmom+AStUyfXCg=='
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+stages:
+  - stage: tfValidate
+    jobs:
+      - job: validate
+        continueOnError: false
+        steps:
+          - task: TerraformInstaller@1
+            displayName: tfInstall
+            inputs:
+              terraformVersion: 'latest'
+          
