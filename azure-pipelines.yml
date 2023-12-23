@@ -9,10 +9,10 @@ pool:
   vmImage: ubuntu-latest
 
 variables:
-  terraformGroup: ''
-  terraformStorageAccount: ''
-  terraformContainer: ''
-  terraformContainerKey: ''
+  terraformGroup: 'terraform-yml'
+  terraformStorageAccount: 'terraformscriptsstorage'
+  terraformContainer: 'terraform-scripts'
+  terraformContainerKey: 'V4c8Aez6EiYqAPqBGL6fbiY3YWZ4DwkCosi0GD0sP1fcyshhuRZ4aV6fpwdQE847iyArbmOLFmom+AStUyfXCg=='
 
 steps:
 - script: echo Hello, world!
