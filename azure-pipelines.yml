@@ -3,11 +3,16 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-trigger:
-- main
+trigger: none
 
 pool:
   vmImage: ubuntu-latest
+
+variables:
+  terraformGroup: ''
+  terraformStorageAccount: ''
+  terraformContainer: ''
+  terraformContainerKey: ''
 
 steps:
 - script: echo Hello, world!
