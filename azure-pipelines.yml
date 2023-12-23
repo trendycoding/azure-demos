@@ -25,4 +25,50 @@ stages:
             displayName: tfInstall
             inputs:
               terraformVersion: 'latest'
-          
+          - task: TerraformTaskV4@4
+            displayName: tfInit
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              backendServiceArm: 'TerraformDeploymentToTestAccount'
+              backendAzureRmResourceGroupName: '$(terraformGroup)'
+              backendAzureRmStorageAccountName: '$(terraformStorageAccount)'
+              backendAzureRmContainerName: '$(terraformContainer)'
+              backendAzureRmKey: '$(terraformContainerKey)'
+          - task: TerraformTaskV4@4
+            displayName: tfValidate
+            inputs:
+              provider: 'azurerm'
+              command: 'validate'
+  - stage: tfDeploy
+    condition: succeeded(tfValidate)
+    dependsOn: tfValidate
+    jobs:
+      - job: apply
+        steps:
+          - task: TerraformInstaller@1
+            displayName: tfInstall
+            inputs:
+              terraformVersion: 'latest'
+          - task: TerraformTaskV4@4
+            displayName: tfInit
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              backendServiceArm: 'TerraformDeploymentToTestAccount'
+              backendAzureRmResourceGroupName: '$(terraformGroup)'
+              backendAzureRmStorageAccountName: '$(terraformStorageAccount)'
+              backendAzureRmContainerName: '$(terraformContainer)'
+              backendAzureRmKey: '$(terraformContainerKey)'
+          - task: TerraformTaskV4@4
+            displayName: tfPlan
+            inputs:
+              provider: 'azurerm'
+              command: 'plan'
+              environmentServiceNameAzureRM: 'TerraformDeploymentToTestAccount'
+          - task: TerraformTaskV4@4
+            displayName: tfApply
+            inputs:
+              provider: 'azurerm'
+              command: 'apply'
+              environmentServiceNameAzureRM: 'TerraformDeploymentToTestAccount'
