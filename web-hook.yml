@@ -1,0 +1,74 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+# Build following steps from https://www.youtube.com/watch?v=d85-KD9stqc&t=763s
+
+trigger: none
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  terraformGroup: 'terraform-yml'
+  terraformStorageAccount: 'terraformscriptsstorage'
+  terraformContainer: 'terraform-scripts'
+  terraformContainerKey: 'V4c8Aez6EiYqAPqBGL6fbiY3YWZ4DwkCosi0GD0sP1fcyshhuRZ4aV6fpwdQE847iyArbmOLFmom+AStUyfXCg=='
+
+stages:
+  - stage: tfValidate
+    jobs:
+      - job: validate
+        continueOnError: false
+        steps:
+          - task: TerraformInstaller@1
+            displayName: tfInstall
+            inputs:
+              terraformVersion: 'latest'
+          - task: TerraformTaskV4@4
+            displayName: tfInit
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              backendServiceArm: 'TerraformDeploymentToTestAccount'
+              backendAzureRmResourceGroupName: '$(terraformGroup)'
+              backendAzureRmStorageAccountName: '$(terraformStorageAccount)'
+              backendAzureRmContainerName: '$(terraformContainer)'
+              backendAzureRmKey: '$(terraformContainerKey)'
+          - task: TerraformTaskV4@4
+            displayName: tfValidate
+            inputs:
+              provider: 'azurerm'
+              command: 'validate'
+  - stage: tfDeploy
+    condition: succeeded('tfValidate')
+    dependsOn: tfValidate
+    jobs:
+      - job: apply
+        steps:
+          - task: TerraformInstaller@1
+            displayName: tfInstall
+            inputs:
+              terraformVersion: 'latest'
+          - task: TerraformTaskV4@4
+            displayName: tfInit
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              backendServiceArm: 'TerraformDeploymentToTestAccount'
+              backendAzureRmResourceGroupName: '$(terraformGroup)'
+              backendAzureRmStorageAccountName: '$(terraformStorageAccount)'
+              backendAzureRmContainerName: '$(terraformContainer)'
+              backendAzureRmKey: '$(terraformContainerKey)'
+          - task: TerraformTaskV4@4
+            displayName: tfPlan
+            inputs:
+              provider: 'azurerm'
+              command: 'plan'
+              environmentServiceNameAzureRM: 'TerraformDeploymentToTestAccount'
+          - task: TerraformTaskV4@4
+            displayName: tfApply
+            inputs:
+              provider: 'azurerm'
+              command: 'apply'
+              environmentServiceNameAzureRM: 'TerraformDeploymentToTestAccount'
